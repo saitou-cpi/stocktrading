@@ -3,8 +3,8 @@ import datetime
 import pandas as pd
 import logging
 
-from vars import ticker_symbol, initial_capital
-from trading_logic import trading_logic
+from config.vars import ticker_symbol, initial_capital
+from controllers.TradeController import trading_logic
 
 # ディレクトリの設定
 log_dir = "backtestlog"
