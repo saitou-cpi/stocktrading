@@ -1,6 +1,7 @@
 import requests
 import logging
 import os
+import json
 
 from vars import ticker_symbol, initial_capital, base_url, api_key
 from trading_logic import trading_logic
@@ -20,9 +21,26 @@ api_key = api_key
 symbol = ticker_symbol
 
 # 初期所持金
-capital = initial_capital
-holding_quantity = 0
-average_purchase_price = 0
+state_file = 'trade_state.json'
+
+def load_state():
+    if os.path.exists(state_file):
+        with open(state_file, 'r') as f:
+            state = json.load(f)
+        return state['capital'], state['holding_quantity'], state['average_purchase_price']
+    else:
+        return initial_capital, 0, 0
+
+def save_state(capital, holding_quantity, average_purchase_price):
+    state = {
+        'capital': capital,
+        'holding_quantity': holding_quantity,
+        'average_purchase_price': average_purchase_price
+    }
+    with open(state_file, 'w') as f:
+        json.dump(state, f)
+
+capital, holding_quantity, average_purchase_price = load_state()
 
 def get_stock_price(symbol):
     try:
@@ -59,7 +77,6 @@ def buy_stock(symbol, quantity, price):
         logging.info(f"Bought {quantity} shares of {symbol} at {price} each")
     except requests.RequestException as e:
         logging.error(f"Error buying stock: {e}")
-
 
 def sell_stock(symbol, quantity, price):
     global capital, holding_quantity, average_purchase_price
@@ -101,6 +118,7 @@ def day_trade():
         sell_stock(symbol, quantity, price)
 
     logging.info(f"Remaining capital: {capital}, Holding quantity: {holding_quantity}, Average purchase price: {average_purchase_price}")
+    save_state(capital, holding_quantity, average_purchase_price)
 
 if __name__ == "__main__":
     day_trade()
