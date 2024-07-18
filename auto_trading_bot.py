@@ -6,7 +6,11 @@ from ticker_symbol import ticker_symbol
 from trading_logic import trading_logic
 
 # ログの設定
-logging.basicConfig(filename='trade.log', level=logging.INFO)
+log_dir = "trade_logs"
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+log_filename = os.path.join(log_dir, 'auto_trade.log')
+logging.basicConfig(filename=log_filename, level=logging.INFO)
 
 # 楽天証券APIのエンドポイントとAPIキーを設定
 base_url = "https://api.rakuten-sec.co.jp"
@@ -21,11 +25,16 @@ holding_quantity = 0
 average_purchase_price = 0
 
 def get_stock_price(symbol):
-    url = f"{base_url}/v1/marketdata/quote?symbol={symbol}"
-    headers = {"x-api-key": api_key}
-    response = requests.get(url, headers=headers)
-    data = response.json()
-    return data["lastPrice"]
+    try:
+        url = f"{base_url}/v1/marketdata/quote?symbol={symbol}"
+        headers = {"x-api-key": api_key}
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+        return data["lastPrice"]
+    except requests.RequestException as e:
+        logging.error(f"Error fetching stock price: {e}")
+        return None
 
 def buy_stock(symbol, quantity, price):
     global capital, holding_quantity, average_purchase_price
@@ -41,13 +50,16 @@ def buy_stock(symbol, quantity, price):
         "orderType": "market",
         "timeInForce": "day"
     }
-    response = requests.post(url, headers=headers, json=order_data)
-    if response.status_code == 200:
+    try:
+        response = requests.post(url, headers=headers, json=order_data)
+        response.raise_for_status()
         capital -= quantity * price
         holding_quantity += quantity
         average_purchase_price = ((average_purchase_price * (holding_quantity - quantity)) + (price * quantity)) / holding_quantity
         logging.info(f"Bought {quantity} shares of {symbol} at {price} each")
-    return response.json()
+    except requests.RequestException as e:
+        logging.error(f"Error buying stock: {e}")
+
 
 def sell_stock(symbol, quantity, price):
     global capital, holding_quantity, average_purchase_price
@@ -63,14 +75,16 @@ def sell_stock(symbol, quantity, price):
         "orderType": "market",
         "timeInForce": "day"
     }
-    response = requests.post(url, headers=headers, json=order_data)
-    if response.status_code == 200:
+    try:
+        response = requests.post(url, headers=headers, json=order_data)
+        response.raise_for_status()
         capital += quantity * price
         holding_quantity -= quantity
         if holding_quantity == 0:
             average_purchase_price = 0
         logging.info(f"Sold {quantity} shares of {symbol} at {price} each")
-    return response.json()
+    except requests.RequestException as e:
+        logging.error(f"Error selling stock: {e}")
 
 def day_trade():
     global capital, holding_quantity, average_purchase_price
@@ -89,6 +103,4 @@ def day_trade():
     logging.info(f"Remaining capital: {capital}, Holding quantity: {holding_quantity}, Average purchase price: {average_purchase_price}")
 
 if __name__ == "__main__":
-    while True:
-        day_trade()
-        time.sleep(60)  # 1分ごとにチェック
+    auto_trade()

@@ -1,0 +1,8 @@
+# 平日の9:00~11:30に1分おきに実行
+* 9-10 * * 1-5 /usr/bin/python3 /home/ec2-user/stocktrading/script/auto_trading_bot.py
+0-29 11 * * 1-5 /usr/bin/python3 /home/ec2-user/stocktrading/script/auto_trading_bot.py
+
+# 平日の12:30~15:00に1分おきに実行
+30-59 12 * * 1-5 /usr/bin/python3 /home/ec2-user/stocktrading/script/auto_trading_bot.py
+* 13-14 * * 1-5 /usr/bin/python3 /home/ec2-user/stocktrading/script/auto_trading_bot.py
+0-59 14 * * 1-5 /usr/bin/python3 /home/ec2-user/stocktrading/script/auto_trading_bot.py
