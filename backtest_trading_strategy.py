@@ -6,8 +6,14 @@ import logging
 from ticker_symbol import ticker_symbol
 from trading_logic import trading_logic
 
-# ログの設定
-logging.basicConfig(filename='backtest_trade.log', level=logging.INFO)
+# ディレクトリの設定
+log_dir = "backtestlog"
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+
+# ログファイルの設定
+log_filename = os.path.join(log_dir, 'backtest_trade.log')
+logging.basicConfig(filename=log_filename, level=logging.INFO)
 
 # 証券コード
 symbol = ticker_symbol
@@ -22,7 +28,8 @@ average_purchase_price = 0
 output_dir = "stockdata"
 
 # ファイル名を作成
-csv_filename = os.path.join(output_dir, f'{ticker_symbol.replace(".", "_")}_one_month_intraday_stock_data_20240718.csv')  # 特定の日付に対応
+date_str = datetime.datetime.now().strftime('%Y%m%d')  # ファイル名に使われる日付
+csv_filename = os.path.join(output_dir,  f'{ticker_symbol.replace(".", "_")}_one_month_intraday_stock_data_{date_str}.csv')  # 特定の日付に対応
 
 # 過去の株価データを読み込む
 if os.path.exists(csv_filename):
