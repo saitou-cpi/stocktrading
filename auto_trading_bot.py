@@ -1,7 +1,8 @@
-import requests
-import logging
-import os
+import datetime
 import json
+import logging
+import requests
+import os
 
 from vars import ticker_symbol, initial_capital, base_url, api_key
 from trading_logic import trading_logic
@@ -108,14 +109,21 @@ def day_trade():
     price = get_stock_price(symbol)
     logging.info(f"{symbol} current price: {price}")
 
-    action, quantity = trading_logic(price, capital, holding_quantity, average_purchase_price)
+    # 14時45分以降はすべての株を売却
+    now = datetime.datetime.now()
+    if now.hour == 14 and now.minute >= 45:
+        if holding_quantity > 0:
+            logging.info(f"Selling all shares of {symbol} at the end of the day")
+            sell_stock(symbol, holding_quantity, price)
+    else:
+        action, quantity = trading_logic(price, capital, holding_quantity, average_purchase_price)
 
-    if action == 'buy':
-        logging.info(f"Buying {quantity} shares of {symbol}")
-        buy_stock(symbol, quantity, price)
-    elif action == 'sell':
-        logging.info(f"Selling {quantity} shares of {symbol}")
-        sell_stock(symbol, quantity, price)
+        if action == 'buy':
+            logging.info(f"Buying {quantity} shares of {symbol}")
+            buy_stock(symbol, quantity, price)
+        elif action == 'sell':
+            logging.info(f"Selling {quantity} shares of {symbol}")
+            sell_stock(symbol, quantity, price)
 
     logging.info(f"Remaining capital: {capital}, Holding quantity: {holding_quantity}, Average purchase price: {average_purchase_price}")
     save_state(capital, holding_quantity, average_purchase_price)
