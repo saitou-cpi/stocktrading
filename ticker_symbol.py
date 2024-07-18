@@ -1,0 +1,1 @@
+ticker_symbol = '4246.T'
