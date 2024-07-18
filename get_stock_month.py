@@ -4,7 +4,7 @@ import datetime
 import os
 from time import sleep
 
-from ticker_symbol import ticker_symbol
+from vars import ticker_symbol
 
 # 証券コードを設定します。Yahoo Financeでは日本の証券コードに .T を付けます。
 ticker_symbol = ticker_symbol

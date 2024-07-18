@@ -3,7 +3,7 @@ import datetime
 import pandas as pd
 import logging
 
-from ticker_symbol import ticker_symbol, initial_capital
+from vars import ticker_symbol, initial_capital
 from trading_logic import trading_logic
 
 # ディレクトリの設定

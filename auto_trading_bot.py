@@ -2,7 +2,7 @@ import requests
 import logging
 import os
 
-from ticker_symbol import ticker_symbol, initial_capital, base_url, api_key
+from vars import ticker_symbol, initial_capital, base_url, api_key
 from trading_logic import trading_logic
 
 # ログの設定

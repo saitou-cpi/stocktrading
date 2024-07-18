@@ -1,4 +1,4 @@
-from ticker_symbol import upper_limit, lower_limit
+from vars import upper_limit, lower_limit
 
 def trading_logic(price, capital, holding_quantity, average_purchase_price):
     action = None
