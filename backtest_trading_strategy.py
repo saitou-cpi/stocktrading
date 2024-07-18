@@ -4,7 +4,8 @@ import pandas as pd
 import logging
 
 from config.vars import ticker_symbol, initial_capital
-from controllers.TradeController import trading_logic
+from controllers.controllers import TradeController
+from models.models import TradeModel
 
 # ディレクトリの設定
 log_dir = "backtestlog"
@@ -19,7 +20,6 @@ logging.basicConfig(filename=log_filename, level=logging.INFO)
 symbol = ticker_symbol
 
 # 初期所持金
-initial_capital = initial_capital
 capital = initial_capital
 holding_quantity = 0
 average_purchase_price = 0
@@ -38,6 +38,10 @@ if os.path.exists(csv_filename):
 else:
     logging.error(f"File {csv_filename} does not exist")
     raise FileNotFoundError(f"File {csv_filename} does not exist")
+
+# TradeControllerとTradeModelのインスタンスを作成
+tradecontroller = TradeController()
+trademodel = TradeModel(initial_capital)
 
 def buy_stock(price, quantity):
     global capital, holding_quantity, average_purchase_price
@@ -67,7 +71,7 @@ def backtest():
         price = row['Close']
         logging.info(f"Current price: {price}")
 
-        action, quantity = trading_logic(price, capital, holding_quantity, average_purchase_price)
+        action, quantity = tradecontroller.trading_logic(price)
 
         if action == 'buy':
             logging.info(f"Buying {quantity} shares of {symbol}")

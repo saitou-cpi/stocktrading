@@ -1,6 +1,7 @@
 # stocktrading
 sudo dnf install -y python3-pip git
 pip install virtualenv
+
 git clone https://github.com/saitou-cpi/stocktrading.git
 cd stocktrading/
 virtualenv st_env

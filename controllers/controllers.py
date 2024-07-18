@@ -85,7 +85,7 @@ class TradeController:
             action = 'sell'
             quantity = self.model.holding_quantity
 
-        # ルール3: initial_capitalの金額以内で買える場合は買う
+        # ルール3: capitalの金額以内で買える場合は買う
         elif self.model.capital >= price and self.model.holding_quantity == 0:
             quantity = int(self.model.capital / price)
             if quantity > 0:
