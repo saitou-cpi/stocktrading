@@ -1,9 +1,10 @@
 # stocktrading
 sudo dnf install -y python3-pip
+sudo dnf install -y git
 pip install virtualenv
 git clone https://github.com/saitou-cpi/stocktrading.git
 cd stocktrading/
-virtualenv stocktrading_env
-source stocktrading_env/bin/activate
-pip install requirements.txt
+virtualenv st_env
+source st_env/bin/activate
+pip install -r requirements.txt
 sudo chmod a+x get_stock_month.py

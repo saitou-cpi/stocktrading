@@ -35,8 +35,14 @@ for _ in range(4):  # 1ヶ月は約4週間と仮定
 # 全てのデータを連結
 full_data = pd.concat(all_data)
 
+# 日付順に並び替え
+full_data.sort_index(inplace=True)
+
+# 現在の日付を取得してフォーマット
+date_str = datetime.datetime.now().strftime('%Y%m%d')
+
 # データをCSV形式で保存
-csv_filename = '4246_one_month_intraday_stock_data.csv'
+csv_filename = f'4246_one_month_intraday_stock_data_{date_str}.csv'
 full_data.to_csv(csv_filename)
 
 print(f"1分足の株価データをCSV形式で {csv_filename} に保存しました。")
