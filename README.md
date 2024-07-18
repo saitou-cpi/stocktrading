@@ -6,4 +6,4 @@ cd stocktrading/
 virtualenv st_env
 source st_env/bin/activate
 pip install -r requirements.txt
-sudo chmod a+x get_stock_month.py
+sudo chmod a+x get_stock_month.py backtest_trading_strategy.py

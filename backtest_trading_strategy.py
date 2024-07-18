@@ -3,7 +3,7 @@ import datetime
 import pandas as pd
 import logging
 
-from ticker_symbol import ticker_symbol
+from ticker_symbol import ticker_symbol, initial_capital
 from trading_logic import trading_logic
 
 # ディレクトリの設定
@@ -19,7 +19,7 @@ logging.basicConfig(filename=log_filename, level=logging.INFO)
 symbol = ticker_symbol
 
 # 初期所持金
-initial_capital = 50000
+initial_capital = initial_capital
 capital = initial_capital
 holding_quantity = 0
 average_purchase_price = 0

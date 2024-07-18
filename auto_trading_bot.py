@@ -1,8 +1,8 @@
 import requests
-import time
 import logging
+import os
 
-from ticker_symbol import ticker_symbol
+from ticker_symbol import ticker_symbol, initial_capital, base_url, api_key
 from trading_logic import trading_logic
 
 # ログの設定
@@ -13,14 +13,14 @@ log_filename = os.path.join(log_dir, 'auto_trade.log')
 logging.basicConfig(filename=log_filename, level=logging.INFO)
 
 # 楽天証券APIのエンドポイントとAPIキーを設定
-base_url = "https://api.rakuten-sec.co.jp"
-api_key = "YOUR_API_KEY"
+base_url = base_url
+api_key = api_key
 
 # 証券コード
 symbol = ticker_symbol
 
 # 初期所持金
-capital = 50000
+capital = initial_capital
 holding_quantity = 0
 average_purchase_price = 0
 
@@ -103,4 +103,4 @@ def day_trade():
     logging.info(f"Remaining capital: {capital}, Holding quantity: {holding_quantity}, Average purchase price: {average_purchase_price}")
 
 if __name__ == "__main__":
-    auto_trade()
+    day_trade()
