@@ -1,12 +1,13 @@
 import yfinance as yf
 import pandas as pd
 import datetime
+import os
 from time import sleep
 
 from ticker_symbol import ticker_symbol
 
 # 証券コードを設定します。Yahoo Financeでは日本の証券コードに .T を付けます。
-ticker_symbol = '4246.T'
+ticker_symbol = ticker_symbol
 
 # データを格納するリストを初期化
 all_data = []
@@ -40,11 +41,16 @@ full_data = pd.concat(all_data)
 # 日付順に並び替え
 full_data.sort_index(inplace=True)
 
+# ディレクトリの作成
+output_dir = "stockdata"
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
+
 # 現在の日付を取得してフォーマット
 date_str = datetime.datetime.now().strftime('%Y%m%d')
 
 # データをCSV形式で保存
-csv_filename = f'{ticker_symbol.replace(".", "_")}_one_month_intraday_stock_data_{date_str}.csv'
+csv_filename = os.path.join(output_dir, f'{ticker_symbol.replace(".", "_")}_one_month_intraday_stock_data_{date_str}.csv')
 full_data.to_csv(csv_filename)
 
 print(f"1分足の株価データをCSV形式で {csv_filename} に保存しました。")

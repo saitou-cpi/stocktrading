@@ -1,3 +1,4 @@
+import os
 import datetime
 import pandas as pd
 import logging
@@ -17,10 +18,19 @@ capital = initial_capital
 holding_quantity = 0
 average_purchase_price = 0
 
+# ディレクトリの設定
+output_dir = "stockdata"
+
+# ファイル名を作成
+csv_filename = os.path.join(output_dir, f'{ticker_symbol.replace(".", "_")}_one_month_intraday_stock_data_20240718.csv')  # 特定の日付に対応
+
 # 過去の株価データを読み込む
-date_str = datetime.datetime.now().strftime('%Y%m%d')  # ファイル名に使われる日付
-csv_filename = f'{ticker_symbol.replace(".", "_")}_one_month_intraday_stock_data_{date_str}.csv'
-df = pd.read_csv(csv_filename, index_col='Datetime', parse_dates=True)
+if os.path.exists(csv_filename):
+    df = pd.read_csv(csv_filename, index_col='Datetime', parse_dates=True)
+    logging.info(f"Loaded data from {csv_filename}")
+else:
+    logging.error(f"File {csv_filename} does not exist")
+    raise FileNotFoundError(f"File {csv_filename} does not exist")
 
 def buy_stock(price, quantity):
     global capital, holding_quantity, average_purchase_price
