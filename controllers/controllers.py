@@ -5,10 +5,12 @@ from views.views import Logger
 from config.vars import ticker_symbol, base_url, api_key, upper_limit, lower_limit, initial_capital
 
 class TradeController:
-    def __init__(self):
+    def __init__(self, upper_limit, lower_limit):
         self.model = TradeModel(initial_capital)
         self.logger = Logger()
         self.symbol = ticker_symbol
+        self.upper_limit = upper_limit
+        self.lower_limit = lower_limit
 
     def get_stock_price(self):
         try:
@@ -76,12 +78,12 @@ class TradeController:
         quantity = 0
 
         # ルール1: 取得した金額よりupper_limit%上がったら売る
-        if self.model.holding_quantity > 0 and price >= self.model.average_purchase_price * upper_limit:
+        if self.model.holding_quantity > 0 and price >= self.model.average_purchase_price * self.upper_limit:
             action = 'sell'
             quantity = self.model.holding_quantity
 
         # ルール2: 取得した金額よりlower_limit%下がったら売る
-        elif self.model.holding_quantity > 0 and price <= self.model.average_purchase_price * lower_limit:
+        elif self.model.holding_quantity > 0 and price <= self.model.average_purchase_price * self.lower_limit:
             action = 'sell'
             quantity = self.model.holding_quantity
 
