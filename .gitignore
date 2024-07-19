@@ -1,6 +1,8 @@
 st_env/*
 
 .idea/
+stockdata/
+backtestlog/
 
 *.pyc
 __pycache__/

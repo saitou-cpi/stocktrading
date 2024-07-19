@@ -24,7 +24,11 @@ for _ in range(4):  # 1ヶ月は約4週間と仮定
     
     # データをダウンロード
     try:
-        data = yf.download(ticker_symbol, start=start_date.strftime('%Y-%m-%d'), end=end_date.strftime('%Y-%m-%d'), interval="1m")
+        data = yf.download(ticker_symbol,
+                           start=start_date.strftime('%Y-%m-%d'),
+                           end=end_date.strftime('%Y-%m-%d'),
+                           interval="1m"
+                           )
         all_data.append(data)
     except Exception as e:
         print(f"Error downloading data for {start_date} to {end_date}: {e}")
@@ -50,7 +54,8 @@ if not os.path.exists(output_dir):
 date_str = datetime.datetime.now().strftime('%Y%m%d')
 
 # データをCSV形式で保存
-csv_filename = os.path.join(output_dir, f'{ticker_symbol.replace(".", "_")}_one_month_intraday_stock_data_{date_str}.csv')
+csv_filename = os.path.join(output_dir,
+                            f'{ticker_symbol.replace(".", "_")}_one_month_intraday_stock_data_{date_str}.csv')
 full_data.to_csv(csv_filename)
 
 print(f"1分足の株価データをCSV形式で {csv_filename} に保存しました。")

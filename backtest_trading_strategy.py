@@ -13,7 +13,7 @@ if not os.path.exists(log_dir):
 
 # ログファイルの設定
 log_filename = os.path.join(log_dir, 'backtest_trade.log')
-logging.basicConfig(filename=log_filename, level=logging.DEBUG)
+logging.basicConfig(filename=log_filename, level=logging.INFO)
 
 # 証券コード
 symbol = ticker_symbol
@@ -34,44 +34,48 @@ else:
     raise FileNotFoundError(f"File {csv_filename} does not exist")
 
 # 取引関数の定義
-def execute_trade(action, price, quantity, capital, holding_quantity, average_purchase_price):
-    if action == 'buy':
-        if quantity * price > capital:
-            quantity = capital // price  # 買えるだけ買う
-        if quantity > 0:
-            capital -= quantity * price
-            holding_quantity += quantity
-            if holding_quantity > 0:
-                average_purchase_price = ((average_purchase_price * (holding_quantity - quantity)) + (price * quantity)) / holding_quantity
-            logging.debug(f"Bought {quantity} shares at {price} each. New capital: {capital}, Holding: {holding_quantity}, Avg purchase price: {average_purchase_price}")
-    elif action == 'sell':
-        if quantity > holding_quantity:
-            quantity = holding_quantity  # 売れるだけ売る
-        if quantity > 0:
-            capital += quantity * price
-            holding_quantity -= quantity
-            if holding_quantity == 0:
-                average_purchase_price = 0
-            logging.debug(f"Sold {quantity} shares at {price} each. New capital: {capital}, Holding: {holding_quantity}, Avg purchase price: {average_purchase_price}")
+def buy_stock(price, quantity, capital, holding_quantity, average_purchase_price):
+    if quantity * price > capital:
+        quantity = capital // price  # 買えるだけ買う
+    if quantity > 0:
+        capital -= quantity * price
+        holding_quantity += quantity
+        if holding_quantity > 0:
+            average_purchase_price = ((average_purchase_price * (holding_quantity - quantity)) + (price * quantity)) / holding_quantity
+        logging.info(f"Bought {quantity} shares at {price} each. New capital: {capital}, Holding: {holding_quantity}")
+    return capital, holding_quantity, average_purchase_price
+
+def sell_stock(price, quantity, capital, holding_quantity, average_purchase_price):
+    if quantity > holding_quantity:
+        quantity = holding_quantity  # 売れるだけ売る
+    if quantity > 0:
+        capital += quantity * price
+        holding_quantity -= quantity
+        if holding_quantity == 0:
+            average_purchase_price = 0
+        logging.info(f"Sold {quantity} shares at {price} each. New capital: {capital}, Holding: {holding_quantity}")
     return capital, holding_quantity, average_purchase_price
 
 def backtest(df, upper_limit, lower_limit):
     capital = initial_capital
     holding_quantity = 0
     average_purchase_price = 0
-    trade_controller = TradeController(upper_limit, lower_limit)
+    trade_controller = TradeController()
 
     for index, row in df.iterrows():
         price = row['Close']
-        logging.debug(f"Current price: {price}")
+        logging.info(f"Current price: {price}")
 
         action, quantity = trade_controller.trading_logic(price)
-        logging.debug(f"Action: {action}, Quantity: {quantity}, Price: {price}, Upper limit: {upper_limit}, Lower limit: {lower_limit}")
 
-        if action:
-            capital, holding_quantity, average_purchase_price = execute_trade(action, price, quantity, capital, holding_quantity, average_purchase_price)
+        if action == 'buy':
+            logging.info(f"Buying {quantity} shares of {symbol}")
+            capital, holding_quantity, average_purchase_price = buy_stock(price, quantity, capital, holding_quantity, average_purchase_price)
+        elif action == 'sell':
+            logging.info(f"Selling {quantity} shares of {symbol}")
+            capital, holding_quantity, average_purchase_price = sell_stock(price, quantity, capital, holding_quantity, average_purchase_price)
 
-        logging.debug(f"Remaining capital: {capital}, Holding quantity: {holding_quantity}, Average purchase price: {average_purchase_price}")
+        logging.info(f"Remaining capital: {capital}, Holding quantity: {holding_quantity}, Average purchase price: {average_purchase_price}")
 
     final_value = capital + holding_quantity * df.iloc[-1]['Close']
     profit_loss = final_value - initial_capital
