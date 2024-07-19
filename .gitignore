@@ -1,4 +1,6 @@
-st_env/
+st_env/*
+
+.idea/*
 
 *.pyc
 __pycache__/
