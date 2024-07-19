@@ -88,8 +88,8 @@ if __name__ == "__main__":
 
     results = []
 
-    for upper_limit in [1.01, 1.02, 1.03, 1.04, 1.05, 1.06, 1.07, 1.08, 1.09]:
-        for lower_limit in [0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99]:
+    for upper_limit in [1.01, 1.02, 1.03, 1.04, 1.05]:
+        for lower_limit in [0.95, 0.96, 0.97, 0.98, 0.99]:
             logging.info(f"Testing upper_limit: {upper_limit}, lower_limit: {lower_limit}")
             final_value, profit_loss = backtest(df, upper_limit, lower_limit)
             results.append((upper_limit, lower_limit, final_value, profit_loss))

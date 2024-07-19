@@ -9,6 +9,12 @@ source st_env/bin/activate
 pip install -r requirements.txt
 sudo chmod a+x get_stock_month.py backtest_trading_strategy.py
 
+## Linux
+export API_KEY=YOUR_API_KEY
+
+## Windows
+set API_KEY=YOUR_API_KEY
+
 
 # MVC
 モデル（Model）:
