@@ -12,7 +12,8 @@ if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 
 # ログファイルの設定
-log_filename = os.path.join(log_dir, 'backtest_trade.log')
+results_date_str = datetime.datetime.now().strftime('%Y%m%d%H%M')  # ファイル名に使われる日付
+log_filename = os.path.join(log_dir, f'{ticker_symbol.replace(".", "_")}backtest_trade_{results_date_str}.log')
 logging.basicConfig(filename=log_filename, level=logging.INFO)
 
 # 証券コード
@@ -60,7 +61,7 @@ def backtest(df, upper_limit, lower_limit):
     capital = initial_capital
     holding_quantity = 0
     average_purchase_price = 0
-    trade_controller = TradeController()
+    trade_controller = TradeController(backtest=True, backtest_data_path=csv_filename)
 
     for index, row in df.iterrows():
         price = row['Close']
@@ -88,8 +89,8 @@ if __name__ == "__main__":
 
     results = []
 
-    for upper_limit in [1.01, 1.02, 1.03, 1.04, 1.05]:
-        for lower_limit in [0.95, 0.96, 0.97, 0.98, 0.99]:
+    for upper_limit in [1.01]:
+        for lower_limit in [0.95, 0.96, 0.97]:
             logging.info(f"Testing upper_limit: {upper_limit}, lower_limit: {lower_limit}")
             final_value, profit_loss = backtest(df, upper_limit, lower_limit)
             results.append((upper_limit, lower_limit, final_value, profit_loss))
@@ -106,7 +107,6 @@ if __name__ == "__main__":
     print(f"Best Profit/Loss: {best_profit_loss}")
 
     # 結果をCSVに保存
-    results_date_str = datetime.datetime.now().strftime('%Y%m%d%m')  # ファイル名に使われる日付
     results_df = pd.DataFrame(results, columns=['upper_limit', 'lower_limit', 'final_value', 'profit_loss'])
     results_filename = os.path.join(log_dir, f'{ticker_symbol.replace(".", "_")}_backtest_results_{results_date_str}.csv')
     results_df.to_csv(results_filename, index=False)
