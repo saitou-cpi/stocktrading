@@ -22,8 +22,8 @@ symbol = ticker_symbol
 output_dir = "stockdata"
 
 # ファイル名を作成
-date_str = datetime.datetime.now().strftime('%Y%m%d')  # ファイル名に使われる日付
-csv_filename = os.path.join(output_dir, f'{ticker_symbol.replace(".", "_")}_one_month_intraday_stock_data_{date_str}.csv')  # 特定の日付に対応
+stockdata_date_str = datetime.datetime.now().strftime('%Y%m%d')  # ファイル名に使われる日付
+csv_filename = os.path.join(output_dir, f'{ticker_symbol.replace(".", "_")}_one_month_intraday_stock_data_{stockdata_date_str}.csv')  # 特定の日付に対応
 
 # 過去の株価データを読み込む
 if os.path.exists(csv_filename):
@@ -106,7 +106,8 @@ if __name__ == "__main__":
     print(f"Best Profit/Loss: {best_profit_loss}")
 
     # 結果をCSVに保存
+    results_date_str = datetime.datetime.now().strftime('%Y%m%d%m')  # ファイル名に使われる日付
     results_df = pd.DataFrame(results, columns=['upper_limit', 'lower_limit', 'final_value', 'profit_loss'])
-    results_filename = os.path.join(output_dir, 'backtest_results.csv')
+    results_filename = os.path.join(log_dir, f'{ticker_symbol.replace(".", "_")}_backtest_results_{results_date_str}.csv')
     results_df.to_csv(results_filename, index=False)
     logging.info(f"Backtest results saved to {results_filename}")

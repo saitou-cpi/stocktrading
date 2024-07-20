@@ -142,6 +142,7 @@ class TradeController:
 
             self.logger.info(f"Remaining capital: {self.model.capital}, Holding quantity: {self.model.holding_quantity}, Average purchase price: {self.model.average_purchase_price}")
 
+
 if __name__ == "__main__":
     controller = TradeController()
     controller.day_trade()
