@@ -27,7 +27,7 @@ if '証券コード\n(Securities code)' in df.columns:
     df_codes = df[['証券コード\n(Securities code)']]
 
     # CSVに保存
-    df_codes.to_csv('tse_stock_codes.csv', index=False, encoding='utf-8-sig')
+    df_codes.to_csv('tokyo_ticker_symbols.csv', index=False, encoding='utf-8-sig')
 
     print('証券コードの取得が完了しました。')
 else:
