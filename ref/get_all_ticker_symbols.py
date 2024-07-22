@@ -1,16 +1,23 @@
+import os
 import requests
 import pandas as pd
+
+# ディレクトリの作成
+output_dir = "tickersymbolslist"
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
 
 # エクセルファイルのURL
 url = 'https://www.mof.go.jp/policy/international_policy/gaitame_kawase/fdi/list.xlsx'
 
 # エクセルファイルのダウンロード
 response = requests.get(url)
-with open('list.xlsx', 'wb') as file:
+xlsx_path = os.path.join(output_dir, 'list.xlsx')
+with open(xlsx_path, 'wb') as file:
     file.write(response.content)
 
 # エクセルファイルの読み込み
-xls = pd.ExcelFile('list.xlsx')
+xls = pd.ExcelFile(xlsx_path)
 
 # シート名の確認
 print("シート名:", xls.sheet_names)
@@ -28,7 +35,8 @@ if '証券コード\n(Securities code)' in df.columns:
     df_codes.columns = ['ticker_symbol']  # カラム名の変更
 
     # CSVに保存
-    df_codes.to_csv('tokyo_ticker_symbols.csv', index=False, encoding='utf-8-sig')
+    csv_path = os.path.join(output_dir, 'tokyo_ticker_symbols.csv')
+    df_codes.to_csv(csv_path, index=False, encoding='utf-8-sig')
 
     print('証券コードの取得が完了しました。')
 else:
