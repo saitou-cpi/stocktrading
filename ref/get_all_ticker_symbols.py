@@ -22,9 +22,10 @@ df = pd.read_excel(xls, sheet_name='上場企業の銘柄リスト')
 print("データフレームの先頭:", df.head())
 print("列名:", df.columns)
 
-# "証券コード"列の抽出
+# "証券コード"列の抽出とカラム名の変更
 if '証券コード\n(Securities code)' in df.columns:
     df_codes = df[['証券コード\n(Securities code)']]
+    df_codes.columns = ['ticker_symbol']  # カラム名の変更
 
     # CSVに保存
     df_codes.to_csv('tokyo_ticker_symbols.csv', index=False, encoding='utf-8-sig')
