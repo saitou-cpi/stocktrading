@@ -92,8 +92,9 @@ def fetch_and_store_stock_data(ticker, start_date, end_date):
 
 # メイン処理
 def main():
-    # 証券コードの読み込み
-    ticker_symbols = load_ticker_symbols('tokyo_ticker_symbols.csv')
+    # 証券コードのCSVファイルパスを指定
+    csv_path = os.path.join("tickersymbolslist", 'tokyo_ticker_symbols.csv')
+    ticker_symbols = load_ticker_symbols(csv_path)
     
     create_table()
     
