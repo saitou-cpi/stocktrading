@@ -70,7 +70,7 @@ def fetch_and_store_stock_data(ticker, start_date, end_date):
             'Volume': 'volume'
         }, inplace=True)
 
-        with engine.connect() as conn:
+        with engine.begin() as conn:  # 明示的にトランザクションを開始
             for index, row in data.iterrows():
                 conn.execute(text("""
                 INSERT INTO stock_data (ticker, date, open, high, low, close, adj_close, volume)
