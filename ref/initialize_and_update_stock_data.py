@@ -55,7 +55,7 @@ def fetch_and_store_stock_data(ticker, start_date, end_date):
         yf_ticker = f"{ticker}.T"
         data = yf.download(yf_ticker, start=start_date, end=end_date, interval='1d')
         if data.empty:
-            logger.warning(f"No data found for ticker {ticker}")
+            logger.warning(f"No data found for ticker {ticker} from {start_date} to {end_date}")
             return
 
         data.reset_index(inplace=True)
@@ -70,7 +70,7 @@ def fetch_and_store_stock_data(ticker, start_date, end_date):
             'Volume': 'volume'
         }, inplace=True)
 
-        with engine.begin() as conn:  # 明示的にトランザクションを開始
+        with engine.begin() as conn:
             for index, row in data.iterrows():
                 conn.execute(text("""
                 INSERT INTO stock_data (ticker, date, open, high, low, close, adj_close, volume)
@@ -85,7 +85,7 @@ def fetch_and_store_stock_data(ticker, start_date, end_date):
                     'adj_close': row['adj_close'],
                     'volume': row['volume']
                 })
-        logger.info(f"Data for ticker {ticker} inserted successfully.")
+        logger.info(f"Data for ticker {ticker} from {start_date} to {end_date} inserted successfully.")
         
     except Exception as e:
         logger.error(f"Error fetching data for ticker {ticker}: {e}")
@@ -107,7 +107,10 @@ def main():
         else:
             start_date = end_date - datetime.timedelta(days=100)  # データがない場合は過去100日分取得
 
-        fetch_and_store_stock_data(ticker, start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'))
+        try:
+            fetch_and_store_stock_data(ticker, start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'))
+        except Exception as e:
+            logger.error(f"Failed to fetch or store data for ticker {ticker}: {e}")
         sleep(1)  # API制限を避けるために待機
 
 if __name__ == "__main__":
