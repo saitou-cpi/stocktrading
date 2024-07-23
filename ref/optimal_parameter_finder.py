@@ -83,12 +83,12 @@ class TradeController:
     def trading_logic(self, current_price, upper_limit, lower_limit):
         action, quantity = None, 0
 
-        if len(self.historical_prices) < 15:
+        if len(self.historical_prices) < 10:
             self.logger.error("Not enough historical data to calculate moving averages.")
             return action, quantity
 
         short_term_ma = self.calculate_moving_average(self.historical_prices, 5)
-        long_term_ma = self.calculate_moving_average(self.historical_prices, 15)
+        long_term_ma = self.calculate_moving_average(self.historical_prices, 10)
 
         if any(x is None for x in [short_term_ma, long_term_ma]) or any(len(x) == 0 for x in [short_term_ma, long_term_ma]):
             self.logger.error("Error calculating moving averages.")
@@ -114,6 +114,20 @@ class TradeController:
         self.logger.info(f"Action: {action}, Quantity: {quantity}, Price: {current_price}")
         return action, quantity
 
+# トレンドを判定する関数
+def determine_trend(prices):
+    trade_controller = TradeController(pd.DataFrame(prices), "", initial_capital)
+    short_term_ma = trade_controller.calculate_moving_average(prices, 5)[-1]  # 5日移動平均
+    long_term_ma = trade_controller.calculate_moving_average(prices, 10)[-1]  # 10日移動平均
+    last_close = prices.iloc[-1]  # 前日の終値を正しい方法で取得
+
+    if last_close > short_term_ma * 1.2:
+        return "上昇トレンド（前日高騰）"
+    elif short_term_ma > long_term_ma:
+        return "上昇トレンド"
+    else:
+        return "下降トレンド"
+
 def optimize_parameters(df, upper_limit, lower_limit, ticker_symbol):
     trade_controller = TradeController(df, ticker_symbol, initial_capital)
 
@@ -133,7 +147,7 @@ def optimize_parameters(df, upper_limit, lower_limit, ticker_symbol):
 def main():
     for ticker_symbol in ticker_symbols:
         log_dir = setup_logging(ticker_symbol)
-        df = load_stock_data(ticker_symbol, days=30)
+        df = load_stock_data(ticker_symbol, days=10)
 
         param_combinations = [(ul, ll) for ul in upper_limits for ll in lower_limits]
 
@@ -151,10 +165,14 @@ def main():
 
             logging.info(f"Upper limit: {upper_limit}, Lower limit: {lower_limit}, Final value: {final_value}, Profit/Loss: {profit_loss}")
 
+        # トレンドの判定
+        trend = determine_trend(df['close'])
+
         print(f"Ticker: {ticker_symbol}")
         print(f"Best upper limit: {best_upper_limit}")
         print(f"Best lower limit: {best_lower_limit}")
         print(f"Best Profit/Loss: {best_profit_loss}")
+        print(f"Current Trend: {trend}")
 
         # 結果をCSVに保存
         results_df = pd.DataFrame(results, columns=['upper_limit', 'lower_limit', 'final_value', 'profit_loss'])
