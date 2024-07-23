@@ -4,7 +4,8 @@ import pandas as pd
 import logging
 import numpy as np
 from sqlalchemy import create_engine, text
-from config.vars import ticker_symbols, initial_capital, upper_limits, lower_limits, short_term_window, long_term_window, trend_short_term_window, trend_long_term_window
+from config.vars import ticker_symbols, initial_capital, upper_limits, lower_limits, short_term_window, long_term_window
+
 
 # ログの設定
 def setup_logging(symbol):
@@ -117,8 +118,8 @@ class TradeController:
 # トレンドを判定する関数
 def determine_trend(prices):
     trade_controller = TradeController(pd.DataFrame(prices), "", initial_capital)
-    short_term_ma = trade_controller.calculate_moving_average(prices, trend_short_term_window)[-1]  # 20日移動平均
-    long_term_ma = trade_controller.calculate_moving_average(prices, trend_long_term_window)[-1]  # 50日移動平均
+    short_term_ma = trade_controller.calculate_moving_average(prices, short_term_window)[-1]  # 20日移動平均
+    long_term_ma = trade_controller.calculate_moving_average(prices, long_term_window)[-1]  # 50日移動平均
     last_close = prices.iloc[-1]  # 前日の終値を正しい方法で取得
 
     if last_close > short_term_ma * 1.2:
