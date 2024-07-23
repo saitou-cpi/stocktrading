@@ -1,13 +1,12 @@
-'''optimal_parameter_finder.py'''
 import os
 import datetime
 import logging
 import pandas as pd
 from config.vars import ticker_symbols, upper_limits, lower_limits, initial_capital
-from database import load_stock_data
-from trade import TradeController
-from logging_setup import setup_logging
-from determine_trend import determine_trend
+from models.database import load_stock_data
+from controllers.trade import TradeController
+from views.logging_setup import setup_logging
+from utils.trend import determine_trend
 
 def optimize_parameters(df, upper_limit, lower_limit, ticker_symbol, initial_capital):
     trade_controller = TradeController(df, ticker_symbol, initial_capital)
@@ -64,3 +63,4 @@ def main():
 
         # 結果をCSVに保存
         save_results_to_csv(ticker_symbol, results, log_dir)
+
