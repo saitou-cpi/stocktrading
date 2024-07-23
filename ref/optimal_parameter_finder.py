@@ -4,7 +4,7 @@ import pandas as pd
 import logging
 import numpy as np
 from sqlalchemy import create_engine, text
-from config.vars import ticker_symbols, initial_capital, upper_limits, lower_limits
+from config.vars import ticker_symbols, initial_capital, upper_limits, lower_limits, short_term_window, long_term_window, trend_short_term_window, trend_long_term_window
 
 # ログの設定
 def setup_logging(symbol):
@@ -83,12 +83,12 @@ class TradeController:
     def trading_logic(self, current_price, upper_limit, lower_limit):
         action, quantity = None, 0
 
-        if len(self.historical_prices) < 10:
+        if len(self.historical_prices) < long_term_window:
             self.logger.error("Not enough historical data to calculate moving averages.")
             return action, quantity
 
-        short_term_ma = self.calculate_moving_average(self.historical_prices, 5)
-        long_term_ma = self.calculate_moving_average(self.historical_prices, 10)
+        short_term_ma = self.calculate_moving_average(self.historical_prices, short_term_window)
+        long_term_ma = self.calculate_moving_average(self.historical_prices, long_term_window)
 
         if any(x is None for x in [short_term_ma, long_term_ma]) or any(len(x) == 0 for x in [short_term_ma, long_term_ma]):
             self.logger.error("Error calculating moving averages.")
@@ -117,8 +117,8 @@ class TradeController:
 # トレンドを判定する関数
 def determine_trend(prices):
     trade_controller = TradeController(pd.DataFrame(prices), "", initial_capital)
-    short_term_ma = trade_controller.calculate_moving_average(prices, 5)[-1]  # 5日移動平均
-    long_term_ma = trade_controller.calculate_moving_average(prices, 10)[-1]  # 10日移動平均
+    short_term_ma = trade_controller.calculate_moving_average(prices, trend_short_term_window)[-1]  # 20日移動平均
+    long_term_ma = trade_controller.calculate_moving_average(prices, trend_long_term_window)[-1]  # 50日移動平均
     last_close = prices.iloc[-1]  # 前日の終値を正しい方法で取得
 
     if last_close > short_term_ma * 1.2:
@@ -147,7 +147,7 @@ def optimize_parameters(df, upper_limit, lower_limit, ticker_symbol):
 def main():
     for ticker_symbol in ticker_symbols:
         log_dir = setup_logging(ticker_symbol)
-        df = load_stock_data(ticker_symbol, days=10)
+        df = load_stock_data(ticker_symbol, days=30)
 
         param_combinations = [(ul, ll) for ul in upper_limits for ll in lower_limits]
 
