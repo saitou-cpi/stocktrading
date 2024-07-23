@@ -1,4 +1,4 @@
-# database.py
+'''database.py'''
 import os
 import datetime
 import pandas as pd
