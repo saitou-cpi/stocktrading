@@ -1,4 +1,4 @@
-# trend.py
+'''trend.py'''
 import pandas as pd
 from trade import TradeController
 from config.vars import initial_capital, short_term_window, long_term_window
