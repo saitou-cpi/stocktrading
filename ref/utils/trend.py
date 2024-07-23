@@ -1,6 +1,5 @@
-'''trend.py'''
 import pandas as pd
-from trade import TradeController
+from controllers.trade import TradeController
 from config.vars import initial_capital, short_term_window, long_term_window
 
 def determine_trend(prices):
@@ -19,4 +18,5 @@ def determine_trend(prices):
         return "上昇トレンド（前日高騰）"
     elif short_term_ma > long_term_ma:
         return "上昇トレンド"
-    else:        return "下降トレンド"
+    else:
+        return "下降トレンド"
