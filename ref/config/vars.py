@@ -1,4 +1,4 @@
-# config/vars.py
+'''config/vars.py'''
 
 # ターゲット銘柄（複数対応）
 ticker_symbols = ['3350', '2112']
