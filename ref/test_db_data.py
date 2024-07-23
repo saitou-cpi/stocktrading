@@ -1,6 +1,6 @@
 import sqlite3
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 import os
 
 # データベースの設定
@@ -12,20 +12,20 @@ engine = create_engine(f'sqlite:///{db_path}')
 def fetch_data_from_db(ticker=None, limit=5):
     with engine.connect() as conn:
         if ticker:
-            query = f"""
-            SELECT * FROM stock_data WHERE ticker='{ticker}' ORDER BY date DESC LIMIT {limit}
-            """
-            result = conn.execute(query)
+            query = text(f"""
+            SELECT * FROM stock_data WHERE ticker=:ticker ORDER BY date DESC LIMIT :limit
+            """)
+            result = conn.execute(query, {'ticker': ticker, 'limit': limit})
             data = result.fetchall()
             df = pd.DataFrame(data, columns=['id', 'ticker', 'date', 'open', 'high', 'low', 'close', 'adj_close', 'volume'])
         else:
-            query = """
+            query = text("""
             SELECT DISTINCT ticker FROM stock_data
-            """
+            """)
             result = conn.execute(query)
             data = result.fetchall()
             df = pd.DataFrame(data, columns=['ticker'])
-    
+
     return df
 
 # メイン処理
@@ -36,9 +36,9 @@ def main():
     print(tickers_df)
 
     # 特定の証券コードのデータを表示
-    ticker = '1332'  # 確認したい証券コードに変更してください
+    ticker = '4552'  # 確認したい証券コードに変更してください
     print(f"\n{ticker}の最新データ:")
-    stock_data_df = fetch_data_from_db(ticker, limit=5)
+    stock_data_df = fetch_data_from_db(ticker, limit=2)
     print(stock_data_df)
 
 if __name__ == "__main__":
