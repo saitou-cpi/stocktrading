@@ -118,9 +118,15 @@ class TradeController:
 # トレンドを判定する関数
 def determine_trend(prices):
     trade_controller = TradeController(pd.DataFrame(prices), "", initial_capital)
-    short_term_ma = trade_controller.calculate_moving_average(prices, short_term_window)[-1]  # 20日移動平均
-    long_term_ma = trade_controller.calculate_moving_average(prices, long_term_window)[-1]  # 50日移動平均
-    last_close = prices.iloc[-1]  # 前日の終値を正しい方法で取得
+    short_term_ma = trade_controller.calculate_moving_average(prices, short_term_window)
+    long_term_ma = trade_controller.calculate_moving_average(prices, long_term_window)
+
+    if short_term_ma is None or long_term_ma is None:
+        return "データが不足しています"
+
+    short_term_ma = short_term_ma[-1]
+    long_term_ma = long_term_ma[-1]
+    last_close = prices.iloc[-1]
 
     if last_close > short_term_ma * 1.2:
         return "上昇トレンド（前日高騰）"
@@ -144,6 +150,13 @@ def optimize_parameters(df, upper_limit, lower_limit, ticker_symbol):
     final_value = trade_controller.model.capital + trade_controller.model.holding_quantity * df.iloc[-1]['close']
     profit_loss = final_value - initial_capital
     return final_value, profit_loss
+
+def save_results_to_csv(ticker_symbol, results, log_dir):
+    results_df = pd.DataFrame(results, columns=['upper_limit', 'lower_limit', 'final_value', 'profit_loss'])
+    results_filename = os.path.join(log_dir, f'{ticker_symbol.replace(".", "_")}_optimal_parameters_results_{datetime.datetime.now().strftime("%Y%m%d%H%M")}.csv')
+    os.makedirs(os.path.dirname(results_filename), exist_ok=True)
+    results_df.to_csv(results_filename, index=False)
+    logging.info(f"Backtest results saved to {results_filename}")
 
 def main():
     for ticker_symbol in ticker_symbols:
@@ -176,8 +189,4 @@ def main():
         print(f"Current Trend: {trend}")
 
         # 結果をCSVに保存
-        results_df = pd.DataFrame(results, columns=['upper_limit', 'lower_limit', 'final_value', 'profit_loss'])
-        results_filename = os.path.join(log_dir, f'{ticker_symbol.replace(".", "_")}_optimal_parameters_results_{datetime.datetime.now().strftime("%Y%m%d%H%M")}.csv')
-        os.makedirs(os.path.dirname(results_filename), exist_ok=True)
-        results_df.to_csv(results_filename, index=False)
-        logging.info(f"Backtest results saved to {results_filename}")
+        save_results_to_csv(ticker_symbol, results, log_dir)
