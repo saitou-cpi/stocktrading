@@ -73,6 +73,8 @@ class TradeController:
             quantity = (self.model.capital // current_price) // 100 * 100  # 100株単位に調整
             if quantity > 0:
                 action = 'buy'
+            else:
+                self.logger.error(f"Not enough capital to buy at price {current_price}.")
         else:
             if current_price >= self.model.average_price * upper_limit and short_term_ma[-1] > long_term_ma[-1]:
                 action, quantity = 'sell', (self.model.holding_quantity // 100) * 100  # 100株単位に調整
