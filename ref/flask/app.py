@@ -16,7 +16,7 @@ def optimize():
     if not ticker_symbol:
         return jsonify({"error": "Ticker symbol is required"}), 400
 
-    if not initial_capital or initial_capital <= 0:
+    if not initial_capital or initial_capital < 1:
         return jsonify({"error": "Valid initial capital is required"}), 400
 
     if not check_ticker_symbol(ticker_symbol):
