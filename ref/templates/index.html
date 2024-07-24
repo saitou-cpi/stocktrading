@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Optimizer</title>
+</head>
+<body>
+    <h1>Stock Optimizer</h1>
+    <form id="ticker-form" action="/optimize" method="post">
+        <label for="ticker">Enter Ticker Symbol:</label>
+        <input type="text" id="ticker" name="ticker" required pattern="[A-Z0-9]{4}">
+        <button type="submit">Optimize</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('ticker-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const data = new FormData(form);
+            const ticker = data.get('ticker');
+
+            // JavaScriptで追加の検証
+            const tickerPattern = /^[A-Z0-9]{4}$/;
+            if (!tickerPattern.test(ticker)) {
+                alert('Please enter a valid 4-character alphanumeric ticker symbol with uppercase letters.');
+                return;
+            }
+
+            const response = await fetch('/optimize', {
+                method: 'POST',
+                body: data
+            });
+
+            const result = await response.json();
+            const formattedResult = `
+                "Ticker: ${result.ticker}"<br>
+                "Best upper limit: ${result.best_upper_limit}"<br>
+                "Best lower limit: ${result.best_lower_limit}"<br>
+                "Best Profit/Loss: ${result.best_profit_loss}"<br>
+                "Current Trend: ${result.current_trend}"
+            `;
+            document.getElementById('result').innerHTML = formattedResult;
+        });
+    </script>
+</body>
+</html>
