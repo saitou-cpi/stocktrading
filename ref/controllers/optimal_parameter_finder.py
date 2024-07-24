@@ -2,7 +2,7 @@ import os
 import datetime
 import logging
 import pandas as pd
-from config.vars import ticker_symbols, upper_limits, lower_limits, initial_capital
+from config.vars import ticker_symbols, upper_limits, lower_limits, initial_capital, min_data_points
 from models.database import load_stock_data
 from controllers.trade import TradeController
 from views.logging_setup import setup_logging
@@ -34,7 +34,7 @@ def save_results_to_csv(ticker_symbol, results, log_dir):
 def main():
     for ticker_symbol in ticker_symbols:
         log_dir = setup_logging(ticker_symbol)
-        df = load_stock_data(ticker_symbol, days=30)
+        df = load_stock_data(ticker_symbol, days=min_data_points)
 
         param_combinations = [(ul, ll) for ul in upper_limits for ll in lower_limits]
 
