@@ -9,8 +9,11 @@
     <h1>Stock Optimizer</h1>
     <form id="ticker-form" action="/optimize" method="post">
         <label for="ticker">Enter Ticker Symbol:</label>
-        <input type="text" id="ticker" name="ticker" required pattern="[A-Z0-9]{4}">
+        <input type="text" id="ticker" name="ticker" required pattern="[A-Z0-9]{4}"><br>
+        <label for="initial_capital">Enter Initial Capital:</label>
+        <input type="number" id="initial_capital" name="initial_capital" required min="1" step="any"><br>
         <button type="submit">Optimize</button>
+        <button type="button" id="reset-button" style="display: none;">Reset</button>
     </form>
     <div id="result"></div>
 
@@ -19,6 +22,9 @@
             e.preventDefault();
             const form = e.target;
             const data = new FormData(form);
+            const resultDiv = document.getElementById('result');
+            const resetButton = document.getElementById('reset-button');
+            resultDiv.innerHTML = '計算中...'; // Show "calculating" message
 
             const response = await fetch('/optimize', {
                 method: 'POST',
@@ -26,9 +32,9 @@
             });
 
             const result = await response.json();
-            
+
             if (response.status === 400 && result.error) {
-                document.getElementById('result').innerHTML = result.error;
+                resultDiv.innerHTML = result.error;
             } else {
                 const formattedResult = `
                     "Ticker: ${result.ticker}"<br>
@@ -37,8 +43,20 @@
                     "Best Profit/Loss: ${result.best_profit_loss}"<br>
                     "Current Trend: ${result.current_trend}"
                 `;
-                document.getElementById('result').innerHTML = formattedResult;
+                resultDiv.innerHTML = formattedResult;
             }
+
+            resetButton.style.display = 'inline'; // Show the reset button
+        });
+
+        document.getElementById('reset-button').addEventListener('click', () => {
+            const form = document.getElementById('ticker-form');
+            const resultDiv = document.getElementById('result');
+            const resetButton = document.getElementById('reset-button');
+
+            form.reset(); // Reset the form
+            resultDiv.innerHTML = ''; // Clear the result
+            resetButton.style.display = 'none'; // Hide the reset button
         });
     </script>
 </body>
