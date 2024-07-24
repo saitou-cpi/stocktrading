@@ -1,6 +1,6 @@
-from flask import Flask, request, render_template, jsonify
-import logging
+from flask import Flask, request, jsonify, render_template
 from controllers.optimal_parameter_finder import process_ticker
+from models.database import check_ticker_symbol
 
 app = Flask(__name__)
 
@@ -13,7 +13,14 @@ def optimize():
     ticker_symbol = request.form['ticker']
     if not ticker_symbol:
         return jsonify({"error": "Ticker symbol is required"}), 400
+
+    if not check_ticker_symbol(ticker_symbol):
+        return jsonify({"error": "Ticker symbol not found in the database"}), 400
+
     result = process_ticker(ticker_symbol)
+    if not result['trades_executed']:
+        return jsonify({"error": "売買不成立"}), 400
+
     return jsonify(result)
 
 if __name__ == '__main__':
